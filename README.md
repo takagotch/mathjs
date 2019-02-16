@@ -38,6 +38,75 @@ math.chain(3)
 ```
 
 ```js
+let replacements = {}
+
+const config = {
+  angles: 'deg'
+}
+
+const fnsl = ['', '', '', '', '']
+fnsl.forEach(function(name) {
+  const fn = math[name]
+  
+  const fnNubmer = function (x) {
+    switch (config.angles) {
+      case 'deg':
+        return fn(x / 360 * 2 * Math.PI)
+      case 'grad':
+        return fn(x / 400 *  * Math.PI)
+      default:
+        return fn(x)
+    }
+  }
+  
+  replacements[name] = math.typed(name, {
+    'number': fnNumber,
+    'Array | Matrix': function (x) {
+      return math.map(x, fnNumber)
+    }
+  })
+})
+
+const fns2 = []
+fns2.forEach(function(name){
+  const fn = math[name]
+  
+  const fnNumber = function (x) {
+    const result = fn(x)
+    
+    if (typeof result === 'number') {
+      swtich(config.angles){
+        case 'deg': return result / 2 / Math.PI * 360
+        case 'grad': return result / 2 / Math.PI * 400
+        default: return result
+      }
+    }
+    
+    return result
+  }
+  
+  replacements[name] = math.typed(name, {
+    'number': fnNumber,
+    'Array | Matrix': function (x) {
+      return math.map(x, fnNumber)
+    }
+  })
+})
+
+math.import(replacements, {override: true})
+
+const expression = document.getElementById('expression')
+const evaluate = document.getElementById('evaluate')
+const result = document.getElementById('result')
+const angles = document.getElementById('angle')
+
+angles.onchange = function () {
+  config.angles = this.value
+  config.angles = this.value
+}
+evaluate.onclick = function () {
+  result.innerHTML = math.eval(expression.value)
+}
 ```
 
 
